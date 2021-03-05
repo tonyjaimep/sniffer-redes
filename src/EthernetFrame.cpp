@@ -1,6 +1,8 @@
+#include <string.h>
+
 #include <EthernetFrame.hpp>
 
-EthernetFrame::fromBytes(const char* bytes)
+void EthernetFrame::fromBytes(const char* bytes)
 {
 	// cada char es un byte
 	// las direcciones cuentan con 6 bytes
@@ -13,7 +15,7 @@ EthernetFrame::fromBytes(const char* bytes)
 		+ bytes[4] * 0x100
 		+ bytes[5]
 		// hasta que tenemos un campo de 6 bytes guardado en un unsigned long
-	)
+	);
 
 	setSourceAddress(
 		// cada 00 en hexadecimal significa un byte 
@@ -24,20 +26,20 @@ EthernetFrame::fromBytes(const char* bytes)
 		+ bytes[10] * 0x100
 		+ bytes[11]
 		// hasta que tenemos un campo de 6 bytes guardado en un unsigned long
-	)
+	);
 
 	// son dos bytes
 	setType(
 		bytes[12] * 0x100
 		+ bytes[13]
-	)
+	);
 
 	// los primeros 14 bytes no son "data"
-	unsigned dataLength = sizeof(bytes) - 14
+	long unsigned dataLength = sizeof(bytes) - 14;
 
 	char data[dataLength];
 
-	memcpy(data, bytes[14], dataLength)
+	memcpy(data, &bytes[14], dataLength);
 
-	setData(data)
+	setData(data);
 }
