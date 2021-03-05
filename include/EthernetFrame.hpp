@@ -16,6 +16,8 @@ public:
     char* getData() const;
     void setData(char* value);
 
+    void fromBytes(const char* bytes);
+
 private:
     unsigned long sourceAddress : 6*8;
     unsigned long destinationAddress : 6*8;
