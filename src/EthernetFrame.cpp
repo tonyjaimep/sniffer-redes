@@ -33,6 +33,8 @@ void EthernetFrame::fromBytes(const char* bytes)
 		bytes[12] * 0x100
 		+ bytes[13]
 	);
+	
+
 
 	// los primeros 14 bytes no son "data"
 	long unsigned dataLength = sizeof(bytes) - 14;
@@ -43,3 +45,44 @@ void EthernetFrame::fromBytes(const char* bytes)
 
 	setData(data);
 }
+
+char* EthernetFrame::getData() 
+{ 
+	return this->data;
+}
+
+void EthernetFrame::setData(const char* data)
+{
+	this->data = data;
+}
+
+unsigned long EthernetFrame::getType()
+{
+	return this->type;
+}
+
+void EthernetFrame::setType(const unsigned long type)
+{
+	this->type = type;
+}
+	
+unsigned long EthernetFrame::getDestinationAddress()
+{
+	return this->destinationaddress;
+}
+
+void EthernetFrame::setDestinationAddress(const unsigned long destinationaddress)
+{
+	this->destinationaddress = destinationaddress;
+}
+
+unsigned long EthernetFrame::getSourceAddress()
+{
+	return this->sourceaddress;
+}
+
+void EthernetFrame::setSourceAddress(const unsigned long sourceaddress)
+{
+	this->sourceaddress = sourceaddress;
+}
+	
