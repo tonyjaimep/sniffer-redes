@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <exception>
@@ -44,10 +45,17 @@ int main()
 
 	ef.fromBytes(buffer, length);
 
-	cout << "Dirección de destino: " << hex << ef.getDestinationAddress() << endl;
-	cout << "Dirección de origen: " << hex << ef.getSourceAddress() << endl;
-	cout << "Tipo: " << hex << ef.getType() << endl;
-	cout << "Contenido: " << ef.getData() << endl;
+	cout << "Dirección de destino: " << ef.addressAsString(ef.getDestinationAddress()) << endl;
+	cout << "Dirección de origen: " << ef.addressAsString(ef.getSourceAddress()) << endl;
+	cout << "Tipo: " << setfill('0') << setw(4) << hex << ef.getType()
+		<< " (" << ef.typeAsString(ef.getType()) << ")"
+		<< endl;
+	cout << "Contenido: " << endl;
+
+	for (unsigned i(0); i < length; i++)
+		cout << (unsigned)ef.getData()[i] << " ";
+
+	cout << endl;
 
 	free(buffer);
 	binFile.close();
