@@ -8,15 +8,15 @@ public:
     ~EthernetFrame();
 
     unsigned long getSourceAddress() const;
-    void setSourceAddress(unsigned long value);
+    void setSourceAddress(const unsigned long value);
     unsigned long getDestinationAddress() const;
-    void setDestinationAddress(unsigned long value);
+    void setDestinationAddress(const unsigned long value);
     unsigned long getType() const;
-    void setType(unsigned long value);
+    void setType(const unsigned long value);
     char* getData() const;
     void setData(char* value);
 
-    void fromBytes(const char* bytes);
+    void fromBytes(const char* bytes, const unsigned long& length);
 
 private:
     unsigned long sourceAddress : 6*8;
