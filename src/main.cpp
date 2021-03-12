@@ -55,27 +55,12 @@ int main()
 		<< " (" << ef.typeAsString(ef.getType()) << ")"
 		<< endl;
 
-	cout << "Tamaño del contenido: " << endl;
-	cout << sizeof(ef.getData()) << endl;
-
 	cout << endl;
 
 	// ********************************
 	//             IPV4
 	// ********************************
-	// HAY QUE MOSTRAR:
-	// Versión
-	// IHL
-	// Servicios Diferenciados
-	// Longitud total
-	// Identificación
-	// Banderas (3 bits)
-	// DF, MF
-	// Desplazamiento
-	// TTL
-	// Protocolo
-	// Checksum
-	// Dirección origen y destino
+	// MOSTRAR CONTENIDO
 
 	free(buffer);
 	binFile.close();
