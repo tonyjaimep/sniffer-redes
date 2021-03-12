@@ -11,6 +11,7 @@ using namespace std;
 int main()
 {
 	EthernetFrame ef;
+	Ipv4 ;
 	string filename;
 	ifstream binFile;
 	char* buffer;
@@ -43,6 +44,9 @@ int main()
 
 	binFile.read(buffer, length);
 
+	// ********************************
+	//           ETHERNET
+	// ********************************
 	ef.fromBytes(buffer, length);
 
 	cout << "Dirección de destino: " << ef.addressAsString(ef.getDestinationAddress()) << endl;
@@ -50,12 +54,28 @@ int main()
 	cout << "Tipo: " << setfill('0') << setw(4) << hex << ef.getType()
 		<< " (" << ef.typeAsString(ef.getType()) << ")"
 		<< endl;
-	cout << "Contenido: " << endl;
 
-	for (unsigned i(0); i < length; i++)
-		cout << (unsigned)ef.getData()[i] << " ";
+	cout << "Tamaño del contenido: " << endl;
+	cout << sizeof(ef.getData()) << endl;
 
 	cout << endl;
+
+	// ********************************
+	//             IPV4
+	// ********************************
+	// HAY QUE MOSTRAR:
+	// Versión
+	// IHL
+	// Servicios Diferenciados
+	// Longitud total
+	// Identificación
+	// Banderas (3 bits)
+	// DF, MF
+	// Desplazamiento
+	// TTL
+	// Protocolo
+	// Checksum
+	// Dirección origen y destino
 
 	free(buffer);
 	binFile.close();

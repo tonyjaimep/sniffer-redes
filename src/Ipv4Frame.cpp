@@ -1,16 +1,13 @@
 #include <Ipv4Frame.hpp>
 
+using namespace std;
+
 unsigned Ipv4Frame::getPayloadLength() const
 {
-
+	return payload;
 }
 
 unsigned Ipv4Frame::getOptionsLength() const
-{
-
-}
-
-string Ipv4Frame::addressToString(const unsigned&) const
 {
 
 }
@@ -25,24 +22,77 @@ void Ipv4Frame::constructPayload()
 
 }
 
-~ Ipv4Frame::IpFrame()
+Ipv4Frame::Ipv4Frame()
 {
 
 }
 
-void Ipv4Frame::fromBytes(const char*)
+Ipv4Frame::~Ipv4Frame()
 {
 
+}
+
+void Ipv4Frame::fromBytes(const char* frameBytes)
+{
+	setVersion(frameBytes[0] >> 4);
+	setIhl(frameBytes[0] & 0xF);
+	setService(frameBytes[1]);
+	setTotalLength(frameBytes[2] * 0xFF + frameBytes[3]);
+	setId(frameBytes[4] * 0x100 + frameBytes[5]);
+	setDf((frameBytes[6] >> 6) & 1);
+	setMf((frameBytes[6] >> 7) & 1);
+	setOffset((frameBytes[6] & 0b11111) * 0x10 + frameBytes[7]);
+	setTtl(frameBytes[8]);
+	setProtocol(frameBytes[9]);
+	setCheckSum(frameBytes[10] * 0x100 + static_cast<uint8_t>(frameBytes[11]));
+	setSourceAddress((frameBytes[12] << 24) + (frameBytes[13] << 16) + (frameBytes[14] << 8) + (frameBytes[15]));
+	setDestinationAddress((frameBytes[16] << 24) + (frameBytes[17] << 16) + (frameBytes[18] << 8) + (frameBytes[19]));
+
+	// si el paquete tiene opciones
+	if (getIhl() * getVersion() > 0x20) {
+		unsigned optionsSize(getIhl() * getVersion() - 0x20);
+		char optionsOnBytes[optionsSize];
+
+		for (unsigned i(0); i < optionsSize; i++) {
+			optionsOnBytes[i] = frameBytes[i + 19];
+		}
+		setOptions(optionsOnBytes);
+	}
+
+	// si hay contenidos
+	if (getIhl() * getVersion() > getTotalLength()) {
+		const unsigned payloadStartByte = 19 + getIhl() * getVersion() - 0x20;
+		char payloadOnBytes[getPayloadLength()];
+
+		for (unsigned i(0); i < getPayloadLength(); i++) {
+			payloadOnBytes[i] = frameBytes[i + payloadStartByte];
+		}
+
+		setPayload(payloadOnBytes);
+	}
+}
+
+static string Ipv4Frame::addressToString(const unsigned& address)
+{
+	stringstream ss;
+	ss << (address / 0x1000000);
+	ss << '.';
+	ss << (address / 0x10000 & 0x0000FF);
+	ss << '.';
+	ss << (address / 0x100 & 0x00FF);
+	ss << '.';
+	ss << (address & 0xFF);
+	return ss.str();
 }
 
 string Ipv4Frame::getSourceAddressAsString() const
 {
-
+	return addressToString(getSourceAddress());
 }
 
 string Ipv4Frame::getDestinationAddressAsString() const
 {
-
+	return addressToString(getDestinationAddress());
 }
 
 string Ipv4Frame::getPrecedenceAsString() const
@@ -70,150 +120,139 @@ string Ipv4Frame::getProtocolAsString() const
 
 }
 
-void Ipv4Frame::setVersion(const unsigned&)
+void Ipv4Frame::setVersion(const unsigned& value)
 {
-    version=value;
+	version = value;
 }
 
-void Ipv4Frame::setIhl(const unsigned&)
+void Ipv4Frame::setIhl(const unsigned& value)
 {
-    ihl=value;
+	ihl = value;
 }
 
-void Ipv4Frame::setService(const unsigned&)
+void Ipv4Frame::setService(const unsigned& value)
 {
-    service=value;
+	service = value;
 }
 
-void Ipv4Frame::setTotalLength(const unsigned&)
+void Ipv4Frame::setTotalLength(const unsigned& value)
 {
-    totalLength=value;
+	totalLength = value;
 }
 
-void Ipv4Frame::setId(const unsigned&)
+void Ipv4Frame::setId(const unsigned& value)
 {
-    id=value;
+	id = value;
 }
 
-void Ipv4Frame::setDf(const bool&)
+void Ipv4Frame::setDf(const bool& value)
 {
-    df=value;
+	df=value;
 }
 
-void Ipv4Frame::setMf(const bool&)
+void Ipv4Frame::setMf(const bool& value)
 {
-    mf=value;
+	mf = value;
 }
 
-void Ipv4Frame::setOffset(const unsigned&)
+void Ipv4Frame::setOffset(const unsigned& value)
 {
-    offset=value;
+	offset = value;
 }
 
-void Ipv4Frame::setTtl(const unsigned&)
+void Ipv4Frame::setTtl(const unsigned& value)
 {
-    ttl=value;
+	ttl = value;
 }
 
-void Ipv4Frame::setProtocol(const unsigned&)
+void Ipv4Frame::setProtocol(const unsigned& value)
 {
-    protocol=value;
+	protocol = value;
 }
 
-void Ipv4Frame::setCheckSum(const unsigned&)
+void Ipv4Frame::setSourceAddress(const unsigned& value)
 {
-    checkSum=value;
+	sourceAddress = value;
 }
 
-void Ipv4Frame::setSourceAddress(const unsigned&)
+void Ipv4Frame::setDestinationAddress(const unsigned& value)
 {
-    sourceAddress=value;
+	destinationAddress = value;
 }
 
-void Ipv4Frame::setDestinationAddress(const unsigned&)
+void Ipv4Frame::setOptions(const char* value)
 {
-    destinationAddress=value;
-}
-
-void Ipv4Frame::setOptions(const char*)
-{
-    options=value;
+	options = value;
 }
 
 void Ipv4Frame::setPayload(const char*)
 {
-    payload=value;
+	payload = value;
 }
-
 
 unsigned Ipv4Frame::getVersion() const
 {
-    return version;
+	return version;
 }
 
 unsigned Ipv4Frame::getIhl() const
 {
-    return ihl;
+	return ihl;
 }
 
 unsigned Ipv4Frame::getService() const
 {
-    return service;
+	return service;
 }
 
 unsigned Ipv4Frame::getTotalLength() const
 {
-    return totalLength;
+	return totalLength;
 }
 
 unsigned Ipv4Frame::getId() const
 {
-    return id;
+	return id;
 }
 
 bool Ipv4Frame::getDf() const
 {
-    return df;
+	return df;
 }
 
 bool Ipv4Frame::getMf() const
 {
-    return mf;
+	return mf;
 }
 
 unsigned Ipv4Frame::getOffset() const
 {
-    return offset;
+	return offset;
 }
 
 unsigned Ipv4Frame::getTtl() const
 {
-    return ttl;
+	return ttl;
 }
 
 unsigned Ipv4Frame::getProtocol() const
 {
-    return protocol;
-}
-
-unsigned Ipv4Frame::getCheckSum() const
-{
-    return checkSum;
+	return protocol;
 }
 
 unsigned Ipv4Frame::getCalculatedCheckSum() const
 {
-    return calculatedCheckSum;
+	return calculatedCheckSum;
 }
 
 const unsigned Ipv4Frame::getSourceAddress() const
 {
-    return sourceAddress;
+	return sourceAddress;
 }
 
 const unsigned Ipv4Frame::getDestinationAddress() const
 {
-    return destinationAddress;
+	return destinationAddress;
 }
 
 /*unsigned Ipv4Frame::getPrecedence() const
@@ -242,13 +281,15 @@ unsigned Ipv4Frame::getReservedTosBits() const
 }*/
 
 
-//debemos conservarlos?
+// - debemos conservarlos?
+// - No sé si los paquetes de prueba vengan con opciones,
+// 	pero sí podríamos conservarlos por si los tienen.
 const char* Ipv4Frame::getOptions(void) const
 {
-    return options;
+	return options;
 }
 
 const char* Ipv4Frame::getPayload(void) const
 {
-    return payload;
+	return payload;
 }

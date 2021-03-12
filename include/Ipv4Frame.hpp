@@ -1,3 +1,5 @@
+#include <string>
+
 #pragma once
 
 // medidos en bits
@@ -39,25 +41,22 @@ private:
 	unsigned ttl : IP_STD_TTL_LENGTH;
 	unsigned protocol : IP_STD_PROTOCOL_LENGTH;
 	unsigned checkSum : IP_STD_CHECKSUM_LENGTH;
-	unsigned calculatedCheckSum : IP_STD_CHECKSUM_LENGTH;
 	unsigned sourceAddress : IP_STD_ADDRESS_LENGTH;
 	unsigned destinationAddress : IP_STD_ADDRESS_LENGTH;
 	char* options;
 	char* payload;
 
-	TcpFrame* tcpFrame;
-
 	unsigned getPayloadLength() const;
 	unsigned getOptionsLength() const;
-	std::string addressToString(const unsigned&) const;
-	void calculateCheckSum();
 	void constructPayload();
 
 public:
-	IpFrame();
-	~IpFrame();
+	Ipv4Frame();
+	~Ipv4Frame();
 
 	void fromBytes(const char*);
+
+	static std::string addressToString(const unsigned& address);
 
 	std::string getSourceAddressAsString() const;
 	std::string getDestinationAddressAsString() const;
@@ -78,7 +77,6 @@ public:
 	void setOffset(const unsigned&);
 	void setTtl(const unsigned&);
 	void setProtocol(const unsigned&);
-	void setCheckSum(const unsigned&);
 	void setSourceAddress(const unsigned&);
 	void setDestinationAddress(const unsigned&);
 	void setOptions(const char*);
@@ -95,8 +93,6 @@ public:
 	unsigned getOffset() const;
 	unsigned getTtl() const;
 	unsigned getProtocol() const;
-	unsigned getCheckSum() const;
-	unsigned getCalculatedCheckSum() const;
 	const unsigned getSourceAddress() const;
 	const unsigned getDestinationAddress() const;
 	unsigned getPrecedence() const;
