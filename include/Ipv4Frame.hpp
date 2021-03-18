@@ -102,4 +102,4 @@ public:
 	unsigned getReservedTosBits() const;
 	const char* getOptions(void) const;
 	const char* getPayload(void) const;
-}
+};
