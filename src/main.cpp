@@ -5,13 +5,14 @@
 #include <exception>
 
 #include <EthernetFrame.hpp>
+#include <Ipv4Frame.hpp>
 
 using namespace std;
 
 int main()
 {
 	EthernetFrame ef;
-	Ipv4 ;
+	Ipv4Frame ipv4F;
 	string filename;
 	ifstream binFile;
 	char* buffer;
@@ -54,14 +55,19 @@ int main()
 	cout << "Tipo: " << setfill('0') << setw(4) << hex << ef.getType()
 		<< " (" << ef.typeAsString(ef.getType()) << ")"
 		<< endl;
-
-	cout << endl;
-
-	// ********************************
-	//             IPV4
-	// ********************************
-	// MOSTRAR CONTENIDO
-
+	//ipv4
+	
+	ipv4F.fromBytes(ef.getData());
+	cout<<"versión: "<< dec <<ipv4F.getVersion()<<endl;
+	cout<<"IHL: "<<ipv4F.getIhl()<<endl;
+	cout<<"Servicios diferenciados: "<<ipv4F.getService()<<endl;
+	cout<<"Longitud total: "<<ipv4F.getTotalLength()<<endl;
+	cout<<"Id: "<<ipv4F.getId()<<endl;
+	cout<<"Flags: "<<0<<ipv4F.getDf()<<ipv4F.getMf()<<endl;
+	cout<<"Desplazamiento: "<<ipv4F.getOffset()<<endl;
+	cout<<"TTL: "<<ipv4F.getTtl()<<endl;
+	cout<<"Protocolo: "<<ipv4F.getProtocol()<<endl;
+	//cout<<"CheckSum: "<<ipv4F.get<<endl;
 	free(buffer);
 	binFile.close();
 
