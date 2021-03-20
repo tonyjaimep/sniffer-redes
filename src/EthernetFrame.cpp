@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include <EthernetFrame.hpp>
+#include "../include/EthernetFrame.hpp"
 
 EthernetFrame::EthernetFrame() {}
 EthernetFrame::~EthernetFrame() {}
@@ -12,27 +12,23 @@ void EthernetFrame::fromBytes(const char* bytes, const unsigned long& length)
 {
 	// cada char es un byte
 	// las direcciones cuentan con 6 bytes
-
+	//
 	setDestinationAddress(
-		// cada 00 en hexadecimal significa un byte
-		(bytes[0] & 0xFF)	* 0x10000000000 // resulta en bytes[0] 00 00 00 00 00
-		| (bytes[1] & 0xFF)	* 0x100000000 // resulta en bytes[0] bytes[1] 00 00 00 00
-		| (bytes[2] & 0xFF)	* 0x1000000 // y así
-		| (bytes[3] & 0xFF)	* 0x10000
-		| (bytes[4] & 0xFF)	* 0x100
-		| (bytes[5] & 0xFF)
-		// hasta que tenemos un campo de 6 bytes guardado en un unsigned long
+		(((unsigned long)bytes[0] & 0xFF)	<< (5 * 8))
+		+ (((unsigned long)bytes[1] & 0xFF)	<< (4 * 8))
+		+ ((bytes[2] & 0xFF)			<< (3 * 8))
+		+ ((bytes[3] & 0xFF)			<< (2 * 8))
+		+ ((bytes[4] & 0xFF)			<< 8)
+		+ ((bytes[5] & 0xFF))
 	);
 
 	setSourceAddress(
-		// cada 00 en hexadecimal significa un byte
-		(bytes[6] & 0xFF)	* 0x10000000000 // resulta en bytes[6] 00 00 00 00 00
-		| (bytes[7] & 0xFF)	* 0x100000000 // resulta en bytes[6] bytes[7] 00 00 00 00
-		| (bytes[8] & 0xFF)	* 0x1000000 // y así
-		| (bytes[9] & 0xFF)	* 0x10000
-		| (bytes[10] & 0xFF)	* 0x100
-		| (bytes[11] & 0xFF)
-		// hasta que tenemos un campo de 6 bytes guardado en un unsigned long
+		(((unsigned long)bytes[6] & 0xFF)	<< (5 * 8))
+		+ (((unsigned long)bytes[7] & 0xFF)	<< (4 * 8))
+		+ ((bytes[8] & 0xFF)			<< (3 * 8))
+		+ ((bytes[9] & 0xFF)			<< (2 * 8))
+		+ ((bytes[10] & 0xFF)			<< 8)
+		+ ((bytes[11] & 0xFF))
 	);
 
 	// son dos bytes
@@ -42,13 +38,15 @@ void EthernetFrame::fromBytes(const char* bytes, const unsigned long& length)
 	);
 
 	// los primeros 14 bytes no son "data"
-	long unsigned dataLength = length - 14;
+	size_t dataLength = length - 14;
 
-	char data[dataLength];
+	char dataBuffer[dataLength];
 
-	memcpy(data, bytes + 14, dataLength);
+	for (unsigned i(0); i < dataLength; i++) {
+		dataBuffer[i] = bytes[i + 14];
+	}
 
-	setData(data);
+	setData(dataBuffer, dataLength);
 }
 
 char* EthernetFrame::getData() const
@@ -56,9 +54,13 @@ char* EthernetFrame::getData() const
 	return this->data;
 }
 
-void EthernetFrame::setData(char* data)
+void EthernetFrame::setData(const char* value, size_t dataLength)
 {
-	this->data = data;
+	data = static_cast<char*>(malloc(dataLength));
+
+	for (unsigned i(0); i < dataLength; i++) {
+		data[i] = value[i];
+	}
 }
 
 unsigned long EthernetFrame::getType() const

@@ -16,22 +16,22 @@ public:
     ~EthernetFrame();
 
     unsigned long getSourceAddress() const;
-    void setSourceAddress(const unsigned long value);
     unsigned long getDestinationAddress() const;
+    void setSourceAddress(const unsigned long value);
     void setDestinationAddress(const unsigned long value);
     unsigned long getType() const;
     void setType(const unsigned type);
     char* getData() const;
-    void setData(char* value);
+    void setData(const char* value, size_t dataLength);
 
     void fromBytes(const char* bytes, const unsigned long& length);
 
-    static std::string addressAsString(const unsigned long address);
+    static std::string addressAsString(const unsigned long bytes);
     static std::string typeAsString(const unsigned type);
 
 private:
-    unsigned long sourceAddress : ETHERNET_ADDRESS_LENGTH * 8;
-    unsigned long destinationAddress : ETHERNET_ADDRESS_LENGTH * 8;
+    unsigned long sourceAddress;
+    unsigned long destinationAddress;
     unsigned long type : ETHERNET_TYPE_LENGTH * 8;
     char *data;
 };

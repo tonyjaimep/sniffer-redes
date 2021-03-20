@@ -4,8 +4,8 @@
 #include <string>
 #include <exception>
 
-#include <EthernetFrame.hpp>
-#include <Ipv4Frame.hpp>
+#include "../include/EthernetFrame.hpp"
+#include "../include/Ipv4Frame.hpp"
 
 using namespace std;
 
@@ -50,24 +50,41 @@ int main()
 	// ********************************
 	ef.fromBytes(buffer, length);
 
-	cout << "Dirección de destino: " << ef.addressAsString(ef.getDestinationAddress()) << endl;
-	cout << "Dirección de origen: " << ef.addressAsString(ef.getSourceAddress()) << endl;
-	cout << "Tipo: " << setfill('0') << setw(4) << hex << ef.getType()
-		<< " (" << ef.typeAsString(ef.getType()) << ")"
-		<< endl;
+	cout << "Ethernet" << endl;
+
+	cout << "\tDirección de destino: " << ef.addressAsString(ef.getDestinationAddress()) << endl;
+	cout << "\tDirección de origen: " << ef.addressAsString(ef.getSourceAddress()) << endl;
+	cout << "\tTipo: " << ef.typeAsString(ef.getType())
+		<< " (" << setfill('0') << setw(4) << hex << ef.getType() << ")" << endl;
+
 	//ipv4
-	
-	ipv4F.fromBytes(ef.getData());
-	cout<<"versión: "<< dec <<ipv4F.getVersion()<<endl;
-	cout<<"IHL: "<<ipv4F.getIhl()<<endl;
-	cout<<"Servicios diferenciados: "<<ipv4F.getService()<<endl;
-	cout<<"Longitud total: "<<ipv4F.getTotalLength()<<endl;
-	cout<<"Id: "<<ipv4F.getId()<<endl;
-	cout<<"Flags: "<<0<<ipv4F.getDf()<<ipv4F.getMf()<<endl;
-	cout<<"Desplazamiento: "<<ipv4F.getOffset()<<endl;
-	cout<<"TTL: "<<ipv4F.getTtl()<<endl;
-	cout<<"Protocolo: "<<ipv4F.getProtocol()<<endl;
-	//cout<<"CheckSum: "<<ipv4F.get<<endl;
+	if (ef.getType() == ETHERNET_TYPE_IPV4) {
+		ipv4F.fromBytes(ef.getData());
+		cout << "IPV4" << endl;
+		cout << "\tVersión: " << dec <<ipv4F.getVersion()<< endl;
+		cout << "\tIHL: " <<ipv4F.getIhl()<< endl;
+		cout << "\tServicios Diferenciados: " << ipv4F.getService()<< endl;
+		cout << "\tLongitud total: " << dec << ipv4F.getTotalLength() << endl;
+		cout << "\tID: 0x" << hex << ipv4F.getId() << " (" << dec << ipv4F.getId() <<")"<< endl;
+		cout << "\tFlags: " << 0 << ipv4F.getDf() << ipv4F.getMf();
+
+		if (ipv4F.getDf())
+			cout << " (Don't Fragment)";
+		if (ipv4F.getMf())
+			cout << " (More Fragments)";
+
+		cout << endl;
+
+		cout << "\tDesplazamiento: " << ipv4F.getOffset() << endl;
+		cout << "\tTTL: "  << ipv4F.getTtl() << endl;
+		cout << "\tProtocolo: " << ipv4F.getProtocolAsString() << " (" << ipv4F.getProtocol() << ")" << endl;
+		cout << "\tCheckSum: 0x" << hex << ipv4F.getCheckSum() <<endl;
+		cout << "\tDirección de origen: " << ipv4F.getSourceAddressAsString() << endl;
+		cout << "\tDirección de destino: " << ipv4F.getDestinationAddressAsString() << endl;
+	} else {
+
+	}
+
 	free(buffer);
 	binFile.close();
 

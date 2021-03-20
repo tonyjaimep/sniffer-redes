@@ -1,35 +1,19 @@
-#include <Ipv4Frame.hpp>
+#include "../include/Ipv4Frame.hpp"
+#include <sstream>
+#include <iostream>
 
 using namespace std;
 
+Ipv4Frame::Ipv4Frame() { }
+
+Ipv4Frame::~Ipv4Frame() { }
+
 unsigned Ipv4Frame::getPayloadLength() const
 {
-	return payload;
-}
+	if (getTotalLength() == 0)
+		return 0;
 
-unsigned Ipv4Frame::getOptionsLength() const
-{
-
-}
-
-void Ipv4Frame::calculateCheckSum()
-{
-
-}
-
-void Ipv4Frame::constructPayload()
-{
-
-}
-
-Ipv4Frame::Ipv4Frame()
-{
-
-}
-
-Ipv4Frame::~Ipv4Frame()
-{
-
+	return getTotalLength() - getIhl() * getVersion();
 }
 
 void Ipv4Frame::fromBytes(const char* frameBytes)
@@ -72,7 +56,7 @@ void Ipv4Frame::fromBytes(const char* frameBytes)
 	}
 }
 
-static string Ipv4Frame::addressToString(const unsigned& address)
+string Ipv4Frame::addressToString(const unsigned& address)
 {
 	stringstream ss;
 	ss << (address / 0x1000000);
@@ -93,31 +77,6 @@ string Ipv4Frame::getSourceAddressAsString() const
 string Ipv4Frame::getDestinationAddressAsString() const
 {
 	return addressToString(getDestinationAddress());
-}
-
-string Ipv4Frame::getPrecedenceAsString() const
-{
-
-}
-
-string Ipv4Frame::getDelayAsString() const
-{
-
-}
-
-string Ipv4Frame::getThroughputAsString() const
-{
-
-}
-
-string Ipv4Frame::getReliabilityAsString() const
-{
-
-}
-
-string Ipv4Frame::getProtocolAsString() const
-{
-
 }
 
 void Ipv4Frame::setVersion(const unsigned& value)
@@ -185,7 +144,7 @@ void Ipv4Frame::setOptions(const char* value)
 	options = value;
 }
 
-void Ipv4Frame::setPayload(const char*)
+void Ipv4Frame::setPayload(const char* value)
 {
 	payload = value;
 }
@@ -240,11 +199,6 @@ unsigned Ipv4Frame::getProtocol() const
 	return protocol;
 }
 
-unsigned Ipv4Frame::getCalculatedCheckSum() const
-{
-	return calculatedCheckSum;
-}
-
 const unsigned Ipv4Frame::getSourceAddress() const
 {
 	return sourceAddress;
@@ -253,6 +207,11 @@ const unsigned Ipv4Frame::getSourceAddress() const
 const unsigned Ipv4Frame::getDestinationAddress() const
 {
 	return destinationAddress;
+}
+
+unsigned Ipv4Frame::getCheckSum() const
+{
+	return checkSum;
 }
 
 /*unsigned Ipv4Frame::getPrecedence() const
@@ -280,10 +239,6 @@ unsigned Ipv4Frame::getReservedTosBits() const
 
 }*/
 
-
-// - debemos conservarlos?
-// - No sé si los paquetes de prueba vengan con opciones,
-// 	pero sí podríamos conservarlos por si los tienen.
 const char* Ipv4Frame::getOptions(void) const
 {
 	return options;
@@ -293,3 +248,26 @@ const char* Ipv4Frame::getPayload(void) const
 {
 	return payload;
 }
+
+void Ipv4Frame::setCheckSum(const unsigned& cs)
+{
+	checkSum = cs;
+}
+
+std::string Ipv4Frame::protocolToString(const unsigned& value)
+{
+	switch (value) {
+	case IP_PROTOCOL_ICMP:
+		return "ICMP";
+	case IP_PROTOCOL_TCP:
+		return "TCP";
+	default:
+		return "Desconocido";
+	}
+}
+
+std::string Ipv4Frame::getProtocolAsString() const
+{
+	return protocolToString(getProtocol());
+}
+

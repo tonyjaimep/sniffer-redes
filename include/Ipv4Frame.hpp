@@ -43,12 +43,8 @@ private:
 	unsigned checkSum : IP_STD_CHECKSUM_LENGTH;
 	unsigned sourceAddress : IP_STD_ADDRESS_LENGTH;
 	unsigned destinationAddress : IP_STD_ADDRESS_LENGTH;
-	char* options;
-	char* payload;
-
-	unsigned getPayloadLength() const;
-	unsigned getOptionsLength() const;
-	void constructPayload();
+	const char* options;
+	const char* payload;
 
 public:
 	Ipv4Frame();
@@ -66,6 +62,8 @@ public:
 	std::string getReliabilityAsString() const;
 	std::string getProtocolAsString() const;
 
+	static std::string protocolToString(const unsigned& protocol);
+
 	// setters
 	void setVersion(const unsigned&);
 	void setIhl(const unsigned&);
@@ -79,10 +77,12 @@ public:
 	void setProtocol(const unsigned&);
 	void setSourceAddress(const unsigned&);
 	void setDestinationAddress(const unsigned&);
+	void setCheckSum(const unsigned&);
 	void setOptions(const char*);
 	void setPayload(const char*);
 
 	// getters
+	unsigned getPayloadLength() const;
 	unsigned getVersion() const;
 	unsigned getIhl() const;
 	unsigned getService() const;
@@ -100,6 +100,7 @@ public:
 	unsigned getThroughput() const;
 	unsigned getReliability() const;
 	unsigned getReservedTosBits() const;
+	unsigned getCheckSum() const;
 	const char* getOptions(void) const;
 	const char* getPayload(void) const;
 };
