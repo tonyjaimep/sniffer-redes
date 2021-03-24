@@ -271,3 +271,57 @@ std::string Ipv4Frame::getProtocolAsString() const
 	return protocolToString(getProtocol());
 }
 
+std::string Ipv4Frame::getDscpAsString() const
+{
+	/*
+	*
+	* CS0 		0 		0: Best Effort
+	* LE 		1 		n/a
+	* CS1, AF11-13 	8,10,12,14 	1: Priority
+	* CS2, AF21-23 	16,18,20,22 	2: Immediate
+	* CS3, AF31-33 	24,26,28,30 	3: Flash - mainly used for voice signaling
+	* CS4, AF41-43 	32,34,36,38 	4: Flash Override
+	* CS5, EF 	40,46 		5: Critical - mainly used for voice RTP
+	* CS6 		48 		6: Internetwork Control
+	* CS7 		56 		7: Network Control
+	*/
+
+	switch (getService() >> 2) {
+		case 0:
+			return "CS0 (Best Effort)";
+		case 1:
+			return "LE (N/A)";
+		case 8: case 10: case 12: case 14:
+			return "CS1 (Priority)";
+		case 16: case 18: case 20: case 22:
+			return "CS2 (Immediate)";
+		case 24: case 26: case 28: case 30:
+			return "CS3 (Flash)";
+		case 32: case 34: case 36: case 38:
+			return "CS4 (Flash Override)";
+		case 40: case 46:
+			return "CS5 (Critical)";
+		case 48:
+			return "CS6 (Internetwork Control)";
+		case 56:
+			return "CS7 (Network Control)";
+		default:
+			return "Desconocido";
+	}
+}
+
+std::string Ipv4Frame::getEcnAsString() const
+{
+	switch (getService() & 0b11) {
+		case 0b00:
+			return "Non ECN-Capable Transport, Non-ECT";
+		case 0b10:
+			return "ECN Capable Transport, ECT(0)";
+		case 0b01:
+			return "ECN Capable Transport, ECT(1)";
+		case 0b11:
+			return "Congestion Encountered, CE";
+		default:
+			return "Desconocido";
+	}
+}

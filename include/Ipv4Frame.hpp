@@ -57,6 +57,8 @@ public:
 	std::string getSourceAddressAsString() const;
 	std::string getDestinationAddressAsString() const;
 	std::string getPrecedenceAsString() const;
+	std::string getDscpAsString() const;
+	std::string getEcnAsString() const;
 	std::string getDelayAsString() const;
 	std::string getThroughputAsString() const;
 	std::string getReliabilityAsString() const;
