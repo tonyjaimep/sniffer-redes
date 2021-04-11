@@ -44,7 +44,7 @@ private:
 	unsigned sourceAddress : IP_STD_ADDRESS_LENGTH;
 	unsigned destinationAddress : IP_STD_ADDRESS_LENGTH;
 	const char* options;
-	const char* payload;
+	char* payload;
 
 public:
 	Ipv4Frame();

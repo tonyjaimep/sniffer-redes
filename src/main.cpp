@@ -6,6 +6,7 @@
 
 #include "../include/EthernetFrame.hpp"
 #include "../include/Ipv4Frame.hpp"
+#include "../include/Icmpv4Frame.hpp"
 
 using namespace std;
 
@@ -91,8 +92,20 @@ int main()
 		cout << "\tCheckSum: 0x" << hex << ipv4F.getCheckSum() <<endl;
 		cout << "\tDirección de origen: " << ipv4F.getSourceAddressAsString() << endl;
 		cout << "\tDirección de destino: " << ipv4F.getDestinationAddressAsString() << endl;
-	} else {
 
+		if (ipv4F.getProtocol() == IP_PROTOCOL_ICMP) {
+			Icmpv4Frame icmpv4F = Icmpv4Frame();
+			icmpv4F.fromBytes(ipv4F.getPayload());
+			cout << "ICMP" << endl;
+			cout << "\tTipo: " << dec << icmpv4F.getType() << " (" << icmpv4F.getTypeAsAstring() << ")"<< endl;
+			cout << "\tCódigo: " << dec << icmpv4F.getCode() << " (" << icmpv4F.getCodeAsAstring() << ")"<< endl;
+			cout << "\tChecksum: 0x" << hex << icmpv4F.getCheckSum() << endl;
+			cout << "\tContenido: "
+				<< hex << (unsigned)icmpv4F.getContent()[0] << " "
+				<< (unsigned)icmpv4F.getContent()[1] << " "
+				<< (unsigned)icmpv4F.getContent()[2] << " "
+				<< (unsigned)icmpv4F.getContent()[3] << endl;
+		}
 	}
 
 	free(buffer);

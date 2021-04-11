@@ -21,7 +21,7 @@ void Ipv4Frame::fromBytes(const char* frameBytes)
 	setVersion(frameBytes[0] >> 4);
 	setIhl(frameBytes[0] & 0xF);
 	setService(frameBytes[1]);
-	setTotalLength(frameBytes[2] * 0xFF + frameBytes[3]);
+	setTotalLength((frameBytes[2] << 8) + frameBytes[3]);
 	setId(frameBytes[4] * 0x100 + frameBytes[5]);
 	setDf((frameBytes[6] >> 6) & 1);
 	setMf((frameBytes[6] >> 7) & 1);
@@ -33,8 +33,8 @@ void Ipv4Frame::fromBytes(const char* frameBytes)
 	setDestinationAddress((frameBytes[16] << 24) + (frameBytes[17] << 16) + (frameBytes[18] << 8) + (frameBytes[19]));
 
 	// si el paquete tiene opciones
-	if (getIhl() * getVersion() > 0x20) {
-		unsigned optionsSize(getIhl() * getVersion() - 0x20);
+	if (getIhl() * getVersion() > 20) {
+		unsigned optionsSize(getIhl() * getVersion() - 20);
 		char optionsOnBytes[optionsSize];
 
 		for (unsigned i(0); i < optionsSize; i++) {
@@ -43,9 +43,8 @@ void Ipv4Frame::fromBytes(const char* frameBytes)
 		setOptions(optionsOnBytes);
 	}
 
-	// si hay contenidos
-	if (getIhl() * getVersion() > getTotalLength()) {
-		const unsigned payloadStartByte = 19 + getIhl() * getVersion() - 0x20;
+	if ((getIhl() * getVersion()) < getTotalLength()) {
+		const unsigned payloadStartByte = getIhl() * getVersion();
 		char payloadOnBytes[getPayloadLength()];
 
 		for (unsigned i(0); i < getPayloadLength(); i++) {
@@ -146,7 +145,14 @@ void Ipv4Frame::setOptions(const char* value)
 
 void Ipv4Frame::setPayload(const char* value)
 {
-	payload = value;
+	if (payload != nullptr)
+		delete payload;
+
+	payload = static_cast<char*>(malloc(getPayloadLength()));
+
+	for (unsigned i=0; i < getPayloadLength(); i++) {
+		payload[i] = value[i];
+	}
 }
 
 unsigned Ipv4Frame::getVersion() const
