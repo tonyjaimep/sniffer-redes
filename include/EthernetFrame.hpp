@@ -7,6 +7,7 @@
 #define ETHERNET_TYPE_LENGTH 2
 
 #define ETHERNET_TYPE_ARP	0x0806
+#define ETHERNET_TYPE_RARP	0x8035
 #define ETHERNET_TYPE_IPV4	0x0800
 
 class EthernetFrame

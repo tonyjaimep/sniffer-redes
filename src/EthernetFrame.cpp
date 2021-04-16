@@ -119,6 +119,9 @@ std::string EthernetFrame::typeAsString(const unsigned type)
 	case ETHERNET_TYPE_ARP:
 		result = "ARP";
 		break;
+	case ETHERNET_TYPE_RARP:
+		result = "RARP";
+		break;
 	case ETHERNET_TYPE_IPV4:
 		result = "IPV4";
 		break;

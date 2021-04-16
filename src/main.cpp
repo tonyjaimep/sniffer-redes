@@ -7,6 +7,7 @@
 #include "../include/EthernetFrame.hpp"
 #include "../include/Ipv4Frame.hpp"
 #include "../include/Icmpv4Frame.hpp"
+#include "../include/ArpFrame.hpp"
 
 using namespace std;
 
@@ -59,7 +60,8 @@ int main()
 		<< " (" << setfill('0') << setw(4) << hex << ef.getType() << ")" << endl;
 
 	//ipv4
-	if (ef.getType() == ETHERNET_TYPE_IPV4) {
+	switch (ef.getType()) {
+	case ETHERNET_TYPE_IPV4:
 		ipv4F.fromBytes(ef.getData());
 		cout << "IPV4" << endl;
 		cout << "\tVersión: " << dec <<ipv4F.getVersion()<< endl;
@@ -106,6 +108,27 @@ int main()
 				<< (unsigned)icmpv4F.getContent()[2] << " "
 				<< (unsigned)icmpv4F.getContent()[3] << endl;
 		}
+
+		break;
+	case ETHERNET_TYPE_ARP:
+		ArpFrame arpf;
+		arpf.fromBytes(ef.getData());
+
+		cout << "ARP" << endl;
+		cout << "\tTipo de Hardware: " << ArpFrame::hardwareTypeAsString(arpf.getHardwareType())
+			<< "(" << hex << "0x" << arpf.getHardwareType() << ")" << endl;
+		cout << "\tTipo de Protocolo: " << ArpFrame::protocolTypeAsString(arpf.getProtocolType())
+			<< "(" << hex << "0x" << arpf.getProtocolType() << ")" << endl;
+		cout << "\tLongitud de dirección de hardware: " << dec << arpf.getHardwareAddressLength() << " bytes" << endl;
+		cout << "\tLongitud de dirección de protocolo: " << dec << arpf.getProtocolAddressLength() << " bytes" << endl;
+		cout << "\tOperación: " << hex << "0x" << arpf.getOperation() << endl;
+		cout << "\tDirección de hardware origen: " << hex << arpf.getSenderHardwareAddress() << endl;
+		cout << "\tDirección de protocolo origen: " << hex << arpf.getSenderProtocolAddress() << endl;
+
+		cout << "\tDirección de hardware destino: " << hex << arpf.getTargetHardwareAddress() << endl;
+		cout << "\tDirección de protocolo destino: " << hex << arpf.getTargetProtocolAddress() << endl;
+
+		break;
 	}
 
 	free(buffer);
