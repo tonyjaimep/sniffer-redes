@@ -57,6 +57,7 @@ public:
 
 	static std::string hardwareTypeAsString(unsigned long);
 	static std::string protocolTypeAsString(unsigned long);
+	static std::string operationAsString(const unsigned& op);
 
-	std::string addressToString(const unsigned& address);
+	static std::string addressToString(const unsigned& address);
 };

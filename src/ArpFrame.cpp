@@ -135,3 +135,32 @@ std::string ArpFrame::addressToString(const unsigned& address)
 	ss << (address & 0xFF);
 	return ss.str();
 }
+
+std::string ArpFrame::operationAsString(const unsigned& op)
+{
+	switch (op) {
+	case 0:
+		return "Reservado";
+	case 1:
+		return "Solicitud";
+	case 2:
+		return "Respuesta";
+	case 3:
+		return "Solicitud RARP";
+	case 4:
+		return "Respuesta RARP";
+	case 5:
+		return "Solicitud DRARP";
+	case 6:
+		return "Respuesta DRARP";
+	case 7:
+		return "Error DRARP";
+	case 8:
+		return "Solicitud InARP";
+	case 9:
+		return "Respuesta InARP";
+	// ...
+	default:
+		return "Desconocido";
+	}
+}

@@ -115,13 +115,14 @@ int main()
 		arpf.fromBytes(ef.getData());
 
 		cout << "ARP" << endl;
+
 		cout << "\tTipo de Hardware: " << ArpFrame::hardwareTypeAsString(arpf.getHardwareType())
 			<< "(" << hex << "0x" << arpf.getHardwareType() << ")" << endl;
 		cout << "\tTipo de Protocolo: " << ArpFrame::protocolTypeAsString(arpf.getProtocolType())
 			<< "(" << hex << "0x" << arpf.getProtocolType() << ")" << endl;
 		cout << "\tLongitud de dirección de hardware: " << dec << arpf.getHardwareAddressLength() << " bytes" << endl;
 		cout << "\tLongitud de dirección de protocolo: " << dec << arpf.getProtocolAddressLength() << " bytes" << endl;
-		cout << "\tOperación: " << hex << "0x" << arpf.getOperation() << endl;
+		cout << "\tOperación: " << arpf.operationAsString(arpf.getOperation()) << " (" << dec << arpf.getOperation() << ")" << endl;
 		cout << "\tDirección de hardware origen: " << hex << ef.addressAsString(arpf.getSenderHardwareAddress()) << endl;
 		cout << "\tDirección de protocolo origen: " << arpf.addressToString(arpf.getSenderProtocolAddress()) << endl;
 
