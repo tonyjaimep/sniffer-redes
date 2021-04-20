@@ -70,7 +70,7 @@ int main()
 		cout << "\tServicios Diferenciados: " << ipv4F.getService() << endl;
 		cout << "\t\tDCSP: " << ipv4F.getDscpAsString() << endl;
 		cout << "\t\tECN: " << ipv4F.getEcnAsString() << endl;
-		
+
 
 		cout << "\tLongitud total: " << dec << ipv4F.getTotalLength() << endl;
 		cout << "\tID: 0x" << hex << ipv4F.getId() << " (" << dec << ipv4F.getId() <<")"<< endl;
@@ -122,11 +122,11 @@ int main()
 		cout << "\tLongitud de dirección de hardware: " << dec << arpf.getHardwareAddressLength() << " bytes" << endl;
 		cout << "\tLongitud de dirección de protocolo: " << dec << arpf.getProtocolAddressLength() << " bytes" << endl;
 		cout << "\tOperación: " << hex << "0x" << arpf.getOperation() << endl;
-		cout << "\tDirección de hardware origen: " << hex << arpf.getSenderHardwareAddress() << endl;
-		cout << "\tDirección de protocolo origen: " << hex << arpf.getSenderProtocolAddress() << endl;
+		cout << "\tDirección de hardware origen: " << hex << ef.addressAsString(arpf.getSenderHardwareAddress()) << endl;
+		cout << "\tDirección de protocolo origen: " << arpf.addressToString(arpf.getSenderProtocolAddress()) << endl;
 
-		cout << "\tDirección de hardware destino: " << hex << arpf.getTargetHardwareAddress() << endl;
-		cout << "\tDirección de protocolo destino: " << hex << arpf.getTargetProtocolAddress() << endl;
+		cout << "\tDirección de hardware destino: " << hex << ef.addressAsString(arpf.getTargetHardwareAddress()) << endl;
+		cout << "\tDirección de protocolo destino: " << arpf.addressToString(arpf.getTargetProtocolAddress()) << endl;
 
 		break;
 	}
