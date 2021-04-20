@@ -1,4 +1,5 @@
 #include "../include/ArpFrame.hpp"
+#include <sstream>
 
 ArpFrame::ArpFrame() {}
 ArpFrame::~ArpFrame() {}
@@ -120,4 +121,17 @@ std::string ArpFrame::protocolTypeAsString(unsigned long protocolType)
 		default:
 			return "Desconocido";
 	}
+}
+
+std::string ArpFrame::addressToString(const unsigned& address)
+{
+	std::stringstream ss;
+	ss << (address / 0x1000000);
+	ss << '.';
+	ss << (address / 0x10000 & 0x0000FF);
+	ss << '.';
+	ss << (address / 0x100 & 0x00FF);
+	ss << '.';
+	ss << (address & 0xFF);
+	return ss.str();
 }
