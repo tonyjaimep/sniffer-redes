@@ -125,6 +125,9 @@ std::string EthernetFrame::typeAsString(const unsigned type)
 	case ETHERNET_TYPE_IPV4:
 		result = "IPV4";
 		break;
+	case ETHERNET_TYPE_IPV6:
+		result = "IPV6";
+		break;
 	default:
 		result = "Desconocido";
 		break;

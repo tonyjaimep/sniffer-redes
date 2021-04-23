@@ -6,6 +6,7 @@
 
 #include "../include/EthernetFrame.hpp"
 #include "../include/Ipv4Frame.hpp"
+#include "../include/Ipv6Frame.hpp"
 #include "../include/Icmpv4Frame.hpp"
 #include "../include/ArpFrame.hpp"
 
@@ -14,7 +15,6 @@ using namespace std;
 int main()
 {
 	EthernetFrame ef;
-	Ipv4Frame ipv4F;
 	string filename;
 	ifstream binFile;
 	char* buffer;
@@ -57,79 +57,101 @@ int main()
 	cout << "\tDirección de destino: " << ef.addressAsString(ef.getDestinationAddress()) << endl;
 	cout << "\tDirección de origen: " << ef.addressAsString(ef.getSourceAddress()) << endl;
 	cout << "\tTipo: " << ef.typeAsString(ef.getType())
-		<< " (" << setfill('0') << setw(4) << hex << ef.getType() << ")" << endl;
+		<< " (0x" << setfill('0') << setw(4) << hex << ef.getType() << ")" << endl;
 
-	//ipv4
 	switch (ef.getType()) {
-	case ETHERNET_TYPE_IPV4:
-		ipv4F.fromBytes(ef.getData());
-		cout << "IPV4" << endl;
-		cout << "\tVersión: " << dec <<ipv4F.getVersion()<< endl;
-		cout << "\tIHL: " << ipv4F.getIhl() << " palabras"<< endl;
+		case ETHERNET_TYPE_IPV4: {
+			Ipv4Frame ipv4F;
+			ipv4F.fromBytes(ef.getData());
+			cout << "IPV4" << endl;
+			cout << "\tVersión: " << dec <<ipv4F.getVersion()<< endl;
+			cout << "\tIHL: " << ipv4F.getIhl() << " palabras"<< endl;
 
-		cout << "\tServicios Diferenciados: " << ipv4F.getService() << endl;
-		cout << "\t\tDCSP: " << ipv4F.getDscpAsString() << endl;
-		cout << "\t\tECN: " << ipv4F.getEcnAsString() << endl;
+			cout << "\tServicios Diferenciados: " << ipv4F.getService() << endl;
+			cout << "\t\tDCSP: " << ipv4F.getDscpAsString() << endl;
+			cout << "\t\tECN: " << ipv4F.getEcnAsString() << endl;
 
 
-		cout << "\tLongitud total: " << dec << ipv4F.getTotalLength() << endl;
-		cout << "\tID: 0x" << hex << ipv4F.getId() << " (" << dec << ipv4F.getId() <<")"<< endl;
-		cout << "\tFlags: " << 0 << ipv4F.getDf() << ipv4F.getMf();
+			cout << "\tLongitud total: " << dec << ipv4F.getTotalLength() << endl; cout << "\tID: 0x" << hex << ipv4F.getId() << " (" << dec << ipv4F.getId() <<")"<< endl;
+			cout << "\tFlags: " << 0 << ipv4F.getDf() << ipv4F.getMf();
 
-		if (ipv4F.getDf())
-			cout << " (Don't Fragment)";
-		else
-			cout << " (Fragment)";
+			if (ipv4F.getDf())
+				cout << " (Don't Fragment)";
+			else
+				cout << " (Fragment)";
 
-		if (ipv4F.getMf())
-			cout << " (More Fragments)";
-		else
-			cout << " (No More Fragments)";
+			if (ipv4F.getMf())
+				cout << " (More Fragments)";
+			else
+				cout << " (No More Fragments)";
 
-		cout << endl;
+			cout << endl;
 
-		cout << "\tDesplazamiento: " << ipv4F.getOffset() << endl;
-		cout << "\tTTL: "  << ipv4F.getTtl() << endl;
-		cout << "\tProtocolo: " << ipv4F.getProtocolAsString() << " (" << ipv4F.getProtocol() << ")" << endl;
-		cout << "\tCheckSum: 0x" << hex << ipv4F.getCheckSum() <<endl;
-		cout << "\tDirección de origen: " << ipv4F.getSourceAddressAsString() << endl;
-		cout << "\tDirección de destino: " << ipv4F.getDestinationAddressAsString() << endl;
+			cout << "\tDesplazamiento: " << ipv4F.getOffset() << endl;
+			cout << "\tTTL: "  << ipv4F.getTtl() << endl;
+			cout << "\tProtocolo: " << ipv4F.getProtocolAsString() << " (" << ipv4F.getProtocol() << ")" << endl;
+			cout << "\tCheckSum: 0x" << hex << ipv4F.getCheckSum() <<endl;
+			cout << "\tDirección de origen: " << ipv4F.getSourceAddressAsString() << endl;
+			cout << "\tDirección de destino: " << ipv4F.getDestinationAddressAsString() << endl;
 
-		if (ipv4F.getProtocol() == IP_PROTOCOL_ICMP) {
-			Icmpv4Frame icmpv4F = Icmpv4Frame();
-			icmpv4F.fromBytes(ipv4F.getPayload());
-			cout << "ICMP" << endl;
-			cout << "\tTipo: " << dec << icmpv4F.getType() << " (" << icmpv4F.getTypeAsAstring() << ")"<< endl;
-			cout << "\tCódigo: " << dec << icmpv4F.getCode() << " (" << icmpv4F.getCodeAsAstring() << ")"<< endl;
-			cout << "\tChecksum: 0x" << hex << icmpv4F.getCheckSum() << endl;
-			cout << "\tContenido: "
-				<< hex << (unsigned)icmpv4F.getContent()[0] << " "
-				<< (unsigned)icmpv4F.getContent()[1] << " "
-				<< (unsigned)icmpv4F.getContent()[2] << " "
-				<< (unsigned)icmpv4F.getContent()[3] << endl;
+			if (ipv4F.getProtocol() == IP_PROTOCOL_ICMP) {
+				Icmpv4Frame icmpv4F = Icmpv4Frame();
+				icmpv4F.fromBytes(ipv4F.getPayload());
+				cout << "ICMP" << endl;
+				cout << "\tTipo: " << dec << icmpv4F.getType() << " (" << icmpv4F.getTypeAsAstring() << ")"<< endl;
+				cout << "\tCódigo: " << dec << icmpv4F.getCode() << " (" << icmpv4F.getCodeAsAstring() << ")"<< endl;
+				cout << "\tChecksum: 0x" << hex << icmpv4F.getCheckSum() << endl;
+				cout << "\tContenido: "
+					<< hex << (unsigned)icmpv4F.getContent()[0] << " "
+					<< (unsigned)icmpv4F.getContent()[1] << " "
+					<< (unsigned)icmpv4F.getContent()[2] << " "
+					<< (unsigned)icmpv4F.getContent()[3] << endl;
+			}
+
+			break;
 		}
+		case ETHERNET_TYPE_IPV6: {
+			Ipv6Frame ipv6F;
+			ipv6F.fromBytes((const unsigned char*)ef.getData());
 
-		break;
-	case ETHERNET_TYPE_ARP:
-		ArpFrame arpf;
-		arpf.fromBytes(ef.getData());
+			cout << "IPV6" << endl;
+			cout << "\tVersión: " << dec << ipv6F.getVersion()<< endl;
 
-		cout << "ARP" << endl;
+			cout << "\tServicios diferenciados: " << ipv6F.getTrafficClass() << endl;
+			cout << "\t\tDCSP: " << Ipv4Frame::dscpToString(ipv6F.getTrafficClass() >> 2) << endl;
+			cout << "\t\tECN: " << Ipv4Frame::ecnToString(ipv6F.getTrafficClass() & 0b11) << endl;
 
-		cout << "\tTipo de Hardware: " << ArpFrame::hardwareTypeAsString(arpf.getHardwareType())
-			<< "(" << hex << "0x" << arpf.getHardwareType() << ")" << endl;
-		cout << "\tTipo de Protocolo: " << ArpFrame::protocolTypeAsString(arpf.getProtocolType())
-			<< "(" << hex << "0x" << arpf.getProtocolType() << ")" << endl;
-		cout << "\tLongitud de dirección de hardware: " << dec << arpf.getHardwareAddressLength() << " bytes" << endl;
-		cout << "\tLongitud de dirección de protocolo: " << dec << arpf.getProtocolAddressLength() << " bytes" << endl;
-		cout << "\tOperación: " << arpf.operationAsString(arpf.getOperation()) << " (" << dec << arpf.getOperation() << ")" << endl;
-		cout << "\tDirección de hardware origen: " << hex << ef.addressAsString(arpf.getSenderHardwareAddress()) << endl;
-		cout << "\tDirección de protocolo origen: " << arpf.addressToString(arpf.getSenderProtocolAddress()) << endl;
+			cout << "\tLongitud de contenido: " << dec << ipv6F.getPayloadLength() << " bytes" << endl;
 
-		cout << "\tDirección de hardware destino: " << hex << ef.addressAsString(arpf.getTargetHardwareAddress()) << endl;
-		cout << "\tDirección de protocolo destino: " << arpf.addressToString(arpf.getTargetProtocolAddress()) << endl;
+			cout << "\tSiguiente encabezado: " << ipv6F.getNextHeader() << " (" << Ipv4Frame::protocolToString(ipv6F.getNextHeader()) << ")" << endl;
+			cout << "\tLímite de saltos: "  << ipv6F.getHopLimit() << endl;
 
-		break;
+			cout << "\tDirección de origen: " << Ipv6Frame::addressToString(ipv6F.getSourceAddress()) << endl;
+			cout << "\tDirección de destino: " << Ipv6Frame::addressToString(ipv6F.getDestinationAddress()) << endl;
+
+			break;
+		}
+		case ETHERNET_TYPE_ARP: {
+			ArpFrame arpf;
+			arpf.fromBytes(ef.getData());
+
+			cout << "ARP" << endl;
+
+			cout << "\tTipo de Hardware: " << ArpFrame::hardwareTypeAsString(arpf.getHardwareType())
+				<< "(" << hex << "0x" << arpf.getHardwareType() << ")" << endl;
+			cout << "\tTipo de Protocolo: " << ArpFrame::protocolTypeAsString(arpf.getProtocolType())
+				<< "(" << hex << "0x" << arpf.getProtocolType() << ")" << endl;
+			cout << "\tLongitud de dirección de hardware: " << dec << arpf.getHardwareAddressLength() << " bytes" << endl;
+			cout << "\tLongitud de dirección de protocolo: " << dec << arpf.getProtocolAddressLength() << " bytes" << endl;
+			cout << "\tOperación: " << arpf.operationAsString(arpf.getOperation()) << " (" << dec << arpf.getOperation() << ")" << endl;
+			cout << "\tDirección de hardware origen: " << hex << ef.addressAsString(arpf.getSenderHardwareAddress()) << endl;
+			cout << "\tDirección de protocolo origen: " << arpf.addressToString(arpf.getSenderProtocolAddress()) << endl;
+
+			cout << "\tDirección de hardware destino: " << hex << ef.addressAsString(arpf.getTargetHardwareAddress()) << endl;
+			cout << "\tDirección de protocolo destino: " << arpf.addressToString(arpf.getTargetProtocolAddress()) << endl;
+
+			break;
+		}
 	}
 
 	free(buffer);

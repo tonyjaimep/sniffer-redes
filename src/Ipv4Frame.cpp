@@ -263,21 +263,28 @@ void Ipv4Frame::setCheckSum(const unsigned& cs)
 std::string Ipv4Frame::protocolToString(const unsigned& value)
 {
 	switch (value) {
+	case IP_PROTOCOL_HOPOPT:
+		return "HOPOPT";
 	case IP_PROTOCOL_ICMP:
 		return "ICMP";
+	case IP_PROTOCOL_IGMP:
+		return "IGMP";
 	case IP_PROTOCOL_TCP:
 		return "TCP";
+	case IP_PROTOCOL_IP_IN_IP:
+		return "IP in IP";
+	case IP_PROTOCOL_ICMPV6:
+		return "ICMPv6";
+	case IP_PROTOCOL_NONXT:
+		return "No Next Header";
+	case IP_PROTOCOL_OPTS:
+		return "IPv6 Options";
 	default:
 		return "Desconocido";
 	}
 }
 
-std::string Ipv4Frame::getProtocolAsString() const
-{
-	return protocolToString(getProtocol());
-}
-
-std::string Ipv4Frame::getDscpAsString() const
+std::string Ipv4Frame::dscpToString(const unsigned& dscp)
 {
 	/*
 	*
@@ -292,7 +299,7 @@ std::string Ipv4Frame::getDscpAsString() const
 	* CS7 		56 		7: Network Control
 	*/
 
-	switch (getService() >> 2) {
+	switch (dscp) {
 		case 0:
 			return "CS0 (Best Effort)";
 		case 1:
@@ -316,9 +323,8 @@ std::string Ipv4Frame::getDscpAsString() const
 	}
 }
 
-std::string Ipv4Frame::getEcnAsString() const
-{
-	switch (getService() & 0b11) {
+std::string Ipv4Frame::ecnToString(const unsigned& ecn) {
+	switch (ecn) {
 		case 0b00:
 			return "Non ECN-Capable Transport, Non-ECT";
 		case 0b10:
@@ -330,4 +336,19 @@ std::string Ipv4Frame::getEcnAsString() const
 		default:
 			return "Desconocido";
 	}
+}
+
+std::string Ipv4Frame::getProtocolAsString() const
+{
+	return protocolToString(getProtocol());
+}
+
+std::string Ipv4Frame::getDscpAsString() const
+{
+	return dscpToString(getService() >> 2);
+}
+
+std::string Ipv4Frame::getEcnAsString() const
+{
+	return ecnToString(getService() & 0b11);
 }

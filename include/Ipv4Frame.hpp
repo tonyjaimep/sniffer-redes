@@ -25,6 +25,9 @@ enum {
 	IP_PROTOCOL_ST,
 	IP_PROTOCOL_TCP,
 	IP_PROTOCOL_CBT,
+	IP_PROTOCOL_ICMPV6 = 58,
+	IP_PROTOCOL_NONXT,
+	IP_PROTOCOL_OPTS,
 };
 
 class Ipv4Frame
@@ -52,8 +55,6 @@ public:
 
 	void fromBytes(const char*);
 
-	static std::string addressToString(const unsigned& address);
-
 	std::string getSourceAddressAsString() const;
 	std::string getDestinationAddressAsString() const;
 	std::string getPrecedenceAsString() const;
@@ -64,7 +65,10 @@ public:
 	std::string getReliabilityAsString() const;
 	std::string getProtocolAsString() const;
 
+	static std::string addressToString(const unsigned& address);
 	static std::string protocolToString(const unsigned& protocol);
+	static std::string dscpToString(const unsigned& dscp);
+	static std::string ecnToString(const unsigned& ecn);
 
 	// setters
 	void setVersion(const unsigned&);
