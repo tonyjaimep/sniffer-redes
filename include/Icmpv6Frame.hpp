@@ -46,8 +46,8 @@ public:
 	unsigned getCheckSum() const;
 	unsigned const char* getContent() const;
 
-	std::string getTypeAsAstring() const;
-	std::string getCodeAsAstring() const;
+	static std::string typeToString(const unsigned&);
+	static std::string codeToString(const unsigned&, const unsigned&);
 
 	void fromBytes(const char*);
 };

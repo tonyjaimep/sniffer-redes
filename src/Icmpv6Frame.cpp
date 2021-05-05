@@ -44,73 +44,72 @@ unsigned const char* Icmpv6Frame::getContent() const
 	return content;
 }
 
-std::string Icmpv6Frame::getTypeAsAstring() const
+std::string Icmpv6Frame::typeToString(const unsigned& type)
 {
-	switch (getType()) {
+	switch (type) {
 	case ICMPV6_TYPE_DESTINATION_UNREACHABLE:
 		return "Destination unreachable";
-    case ICMPV6_TYPE_PACKET_TOO_BIG:
-        return "Packet too big";
-    case ICMPV6_TYPE_TIME_EXCEEDED:
-        return "Time exceeded";
-    case ICMPV6_TYPE_PARAMETER_PROBLEM:
-        return "Parameter problem";
-    case ICMPV6_TYPE_ECHO_REQUEST:
-        return "Echo request";
-    case ICMPV6_TYPE_ECHO_REPLY:
-        return "Echo reply";
-    case ICMPV6_TYPE_ROUTER_SOLICITATION:
-        return "Router solicitation";
-    case ICMPV6_TYPE_ROUTER_ADVERTISEMENT:
-        return "Router advertisement";
-    case ICMPV6_TYPE_NEIGHBOR_SOLICITATION:
-        return "Neighbor solicitation";
-    case ICMPV6_TYPE_NEIGHBOR_ADVERTISEMENT:
-        return "Neighbor advertisement";
-    case ICMPV6_TYPE_REDIRECT_MESSAGE:
-        return "Redirect message";
+	case ICMPV6_TYPE_PACKET_TOO_BIG:
+		return "Packet too big";
+	case ICMPV6_TYPE_TIME_EXCEEDED:
+		return "Time exceeded";
+	case ICMPV6_TYPE_PARAMETER_PROBLEM:
+		return "Parameter problem";
+	case ICMPV6_TYPE_ECHO_REQUEST:
+		return "Echo request";
+	case ICMPV6_TYPE_ECHO_REPLY:
+		return "Echo reply";
+	case ICMPV6_TYPE_ROUTER_SOLICITATION:
+		return "Router solicitation";
+	case ICMPV6_TYPE_ROUTER_ADVERTISEMENT:
+		return "Router advertisement";
+	case ICMPV6_TYPE_NEIGHBOR_SOLICITATION:
+		return "Neighbor solicitation";
+	case ICMPV6_TYPE_NEIGHBOR_ADVERTISEMENT:
+		return "Neighbor advertisement";
+	case ICMPV6_TYPE_REDIRECT_MESSAGE:
+		return "Redirect message";
 	default:
 		return "Unknown";
 	}
 }
 
-std::string Icmpv6Frame::getCodeAsAstring() const
+std::string Icmpv6Frame::codeToString(const unsigned& type, const unsigned& code)
 {
-	switch (getType()) {
+	switch (type) {
 	case ICMPV6_TYPE_DESTINATION_UNREACHABLE:
-		switch (getCode()) {
+		switch (code) {
 		case ICMPV6_CODE_NO_ROUTE_DESTINATION:
 			return "No route to destination ";
-        case ICMPV6_CODE_COMMUNICATION_ADMINISTRATIVELY_PROHIBITED:
-            return "Communication with destination administratively prohibited";
-        case ICMPV6_CODE_BEYOND_SCOPE_OF_SOURCE:
-            return "Beyond scope of source address ";
-        case ICMPV6_CODE_ADDRESS_UNREACHABLE:
-            return "Address unreachable";
+		case ICMPV6_CODE_COMMUNICATION_ADMINISTRATIVELY_PROHIBITED:
+			return "Communication with destination administratively prohibited";
+		case ICMPV6_CODE_BEYOND_SCOPE_OF_SOURCE:
+			return "Beyond scope of source address ";
+		case ICMPV6_CODE_ADDRESS_UNREACHABLE:
+			return "Address unreachable";
 		default:
 			return "Unknown";
 		}
 	case ICMPV6_TYPE_TIME_EXCEEDED:
-		switch (getCode()) {
+		switch (code) {
 		case ICMPV6_CODE_HOP_LIMIT_EXCEEDED:
-		    return "Hop limit exceeded in transit";
-        case ICMPV6_CODE_FRAGMENT_REASSEMBLY_TIME_EXCEEDED:
-            return "Fragment reassembly time exceeded";
+			return "Hop limit exceeded in transit";
+		case ICMPV6_CODE_FRAGMENT_REASSEMBLY_TIME_EXCEEDED:
+			return "Fragment reassembly time exceeded";
 		default:
 			return "Unknown";
 		}
 	case ICMPV6_TYPE_PARAMETER_PROBLEM:
-		switch (getCode()) {
+		switch (code) {
 		case ICMPV6_CODE_ERRONEUS_HEADER_FIELD:
-		    return "Erroneous header field encountered ";
-        case ICMPV6_CODE_UNRECOGNIZED_NEXT_HEADER:
-            return "Unrecognized Next Header type encountered ";
-        case ICMPV6_CODE_UNRECOGNIZED_IPV6_OPTION:
-            return "Unrecognized IPv6 option encountered ";
+			return "Erroneous header field encountered ";
+		case ICMPV6_CODE_UNRECOGNIZED_NEXT_HEADER:
+			return "Unrecognized Next Header type encountered ";
+		case ICMPV6_CODE_UNRECOGNIZED_IPV6_OPTION:
+			return "Unrecognized IPv6 option encountered ";
 		default:
 			return "Unknown";
 		}
-
 	default:
 		return "Unknown";
 	}

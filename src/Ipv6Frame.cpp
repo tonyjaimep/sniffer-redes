@@ -11,13 +11,16 @@ Ipv6Frame::~Ipv6Frame() {}
 void Ipv6Frame::fromBytes(const unsigned char* bytes)
 {
 	unsigned char addressBuffer[IPV6_STD_ADDRESS_LENGTH];
+	unsigned payloadLengthBuffer = bytes[4] * 0x100 + bytes[5];
 
 	setVersion(bytes[0] >> 4);
 	setTrafficClass(((bytes[0] & 0xF) << 4) + (bytes[1] >> 4));
 	setFlowLabel((bytes[1] >> 4) * 0x10000 + (bytes[2] * 0x100) + bytes[3]);
-	setPayloadLength(bytes[4] * 0x100 + bytes[5]);
+	setPayloadLength(payloadLengthBuffer);
 	setNextHeader(bytes[6]);
 	setHopLimit(bytes[7]);
+
+	char* payloadBuffer = (char*)malloc(payloadLengthBuffer);
 
 	for (unsigned i(0); i < IPV6_STD_ADDRESS_LENGTH; i++) {
 		addressBuffer[i] = bytes[8 + i];
@@ -30,6 +33,13 @@ void Ipv6Frame::fromBytes(const unsigned char* bytes)
 	}
 
 	setDestinationAddress(addressBuffer);
+
+	for (unsigned i(0); i < payloadLengthBuffer; i++) {
+		payloadBuffer[i] = bytes[40 + i];
+	}
+
+	setPayload(payloadBuffer, payloadLengthBuffer);
+	delete payloadBuffer;
 }
 
 std::string Ipv6Frame::addressToString(const unsigned char* address)
@@ -49,6 +59,8 @@ std::string Ipv6Frame::getTrafficClassAsString() const
 {
 	return "Traffic class";
 }
+
+const char* Ipv6Frame::getPayload() const { return payload; }
 
 unsigned Ipv6Frame::getVersion() const
 {
@@ -130,5 +142,14 @@ void Ipv6Frame::setDestinationAddress(const unsigned char* val)
 {
 	for (unsigned i(0); i < IPV6_STD_ADDRESS_LENGTH; i++) {
 		destinationAddress[i] = val[i];
+	}
+}
+
+void Ipv6Frame::setPayload(const char* bytes, const unsigned& size)
+{
+	payload = (char*)malloc(size);
+
+	for (unsigned i(0); i < size; i++) {
+		payload[i] = bytes[i];
 	}
 }

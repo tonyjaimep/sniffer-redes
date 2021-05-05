@@ -8,6 +8,7 @@
 #include "../include/Ipv4Frame.hpp"
 #include "../include/Ipv6Frame.hpp"
 #include "../include/Icmpv4Frame.hpp"
+#include "../include/Icmpv6Frame.hpp"
 #include "../include/ArpFrame.hpp"
 
 using namespace std;
@@ -128,6 +129,31 @@ int main()
 
 			cout << "\tDirección de origen: " << Ipv6Frame::addressToString(ipv6F.getSourceAddress()) << endl;
 			cout << "\tDirección de destino: " << Ipv6Frame::addressToString(ipv6F.getDestinationAddress()) << endl;
+
+			switch (ipv6F.getNextHeader()) {
+			case IP_PROTOCOL_ICMPV6: {
+				Icmpv6Frame icmpv6F;
+				icmpv6F.fromBytes(ipv6F.getPayload());
+
+				std::cout << "ICMPv6" << std::endl;
+				std::cout << "\tTipo: "
+					<< Icmpv6Frame::typeToString(icmpv6F.getType())
+					<< " (" << dec <<  icmpv6F.getType() << ")" << std::endl;
+				std::cout << "\tCódigo: "
+					<< Icmpv6Frame::codeToString(icmpv6F.getType(), icmpv6F.getCode())
+					<< " (" << dec <<  icmpv6F.getCode() << ")" << std::endl;
+				std::cout << "\tContenido: "
+					<< hex
+					<< (unsigned)icmpv6F.getContent()[0]
+					<< " " << (unsigned)icmpv6F.getContent()[1]
+					<< " " << (unsigned)icmpv6F.getContent()[2]
+					<< " " << (unsigned)icmpv6F.getContent()[3]
+					<< std::endl;
+				break;
+			}
+			default:
+				break;
+			}
 
 			break;
 		}

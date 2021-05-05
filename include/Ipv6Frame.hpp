@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include "Ipv4Frame.hpp"
 
 #define IP_STD_TRAFFIC_CLASS_LENGTH 16
@@ -23,6 +24,8 @@ private:
 
 	unsigned char sourceAddress[IPV6_STD_ADDRESS_LENGTH];
 	unsigned char destinationAddress[IPV6_STD_ADDRESS_LENGTH];
+
+	char* payload;
 public:
 	Ipv6Frame();
 	~Ipv6Frame();
@@ -52,4 +55,7 @@ public:
 
 	void setSourceAddress(const unsigned char*);
 	void setDestinationAddress(const unsigned char*);
+
+	void setPayload(const char*, const unsigned&);
+	const char* getPayload() const;
 };
