@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Ipv4Frame::Ipv4Frame() { }
+Ipv4Frame::Ipv4Frame() : payload(nullptr) { }
 
 Ipv4Frame::~Ipv4Frame() { }
 

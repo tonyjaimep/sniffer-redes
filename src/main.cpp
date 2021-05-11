@@ -10,6 +10,7 @@
 #include "../include/Icmpv4Frame.hpp"
 #include "../include/Icmpv6Frame.hpp"
 #include "../include/ArpFrame.hpp"
+#include "../include/TcpFrame.hpp"
 
 using namespace std;
 
@@ -95,18 +96,39 @@ int main()
 			cout << "\tDirección de origen: " << ipv4F.getSourceAddressAsString() << endl;
 			cout << "\tDirección de destino: " << ipv4F.getDestinationAddressAsString() << endl;
 
-			if (ipv4F.getProtocol() == IP_PROTOCOL_ICMP) {
-				Icmpv4Frame icmpv4F = Icmpv4Frame();
-				icmpv4F.fromBytes(ipv4F.getPayload());
-				cout << "ICMP" << endl;
-				cout << "\tTipo: " << dec << icmpv4F.getType() << " (" << icmpv4F.getTypeAsAstring() << ")"<< endl;
-				cout << "\tCódigo: " << dec << icmpv4F.getCode() << " (" << icmpv4F.getCodeAsAstring() << ")"<< endl;
-				cout << "\tChecksum: 0x" << hex << icmpv4F.getCheckSum() << endl;
-				cout << "\tContenido: "
-					<< hex << (unsigned)icmpv4F.getContent()[0] << " "
-					<< (unsigned)icmpv4F.getContent()[1] << " "
-					<< (unsigned)icmpv4F.getContent()[2] << " "
-					<< (unsigned)icmpv4F.getContent()[3] << endl;
+			switch (ipv4F.getProtocol()) {
+				case IP_PROTOCOL_ICMP: {
+					Icmpv4Frame icmpv4F = Icmpv4Frame();
+					icmpv4F.fromBytes(ipv4F.getPayload());
+					cout << "ICMP" << endl;
+					cout << "\tTipo: " << dec << icmpv4F.getType() << " (" << icmpv4F.getTypeAsAstring() << ")"<< endl;
+					cout << "\tCódigo: " << dec << icmpv4F.getCode() << " (" << icmpv4F.getCodeAsAstring() << ")"<< endl;
+					cout << "\tChecksum: 0x" << hex << icmpv4F.getCheckSum() << endl;
+					cout << "\tContenido: "
+						<< hex << (unsigned)icmpv4F.getContent()[0] << " "
+						<< (unsigned)icmpv4F.getContent()[1] << " "
+						<< (unsigned)icmpv4F.getContent()[2] << " "
+						<< (unsigned)icmpv4F.getContent()[3] << endl;
+					break;
+				}
+				case IP_PROTOCOL_TCP: {
+					TcpFrame tcpF;
+					tcpF.fromBytes(ipv4F.getPayload(), ipv4F.getPayloadLength());
+					cout << "TCP" << endl;
+					cout << "\tPuerto de origen: " << dec << tcpF.getSourcePort() << endl;
+					cout << "\tPuerto de destino: " << dec << tcpF.getDestinationPort() << endl;
+					cout << "\tNúmero de secuencia: " << dec << tcpF.getSequenceNumber() << endl;
+					cout << "\tNúmero de acuse de recibo: " << dec << tcpF.getAcknowledgementNumber() << endl;
+					cout << "\tLongitud de cabecera: " << dec << (tcpF.getHeaderLength() * 4) << " bytes" << endl;
+					cout << "\tBanderas: " << endl;
+					cout << "\t\t" << tcpF.getFlagsAsString() << endl;
+					cout << "\tTamaño de ventana: " << tcpF.getWindow() << endl;
+					cout << "\tChecksum: 0x" << hex << tcpF.getCheckSum() << endl;
+					// solo muestra puntero urgente si está la bandera URG
+					if (tcpF.getFlags() & 0b000100000)
+						cout << "\tPuntero urgente: " << dec << tcpF.getUrgentPointer() << endl;
+					// mostrar datos
+				}
 			}
 
 			break;
