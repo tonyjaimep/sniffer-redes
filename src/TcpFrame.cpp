@@ -76,3 +76,4 @@ unsigned TcpFrame::getFlags() const { return flags; }
 unsigned TcpFrame::getWindow() const { return window; }
 unsigned TcpFrame::getCheckSum() const { return checkSum; }
 unsigned TcpFrame::getUrgentPointer() const { return urgentPointer; }
+char* TcpFrame::getPayload() const { return payload; }

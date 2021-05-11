@@ -128,6 +128,15 @@ int main()
 					if (tcpF.getFlags() & 0b000100000)
 						cout << "\tPuntero urgente: " << dec << tcpF.getUrgentPointer() << endl;
 					// mostrar datos
+					cout << "\tContenido: " << endl;
+					cout << "\t\tContenido: " << endl;
+					for (unsigned i(0); i < (ipv4F.getPayloadLength() - tcpF.getHeaderLength() * 4); i++)
+						cout << hex << ((unsigned)tcpF.getPayload()[i] & 0xFF) << " ";
+					cout << endl;
+
+					for (unsigned i(0); i < (ipv4F.getPayloadLength() - tcpF.getHeaderLength() * 4); i++)
+						cout << tcpF.getPayload()[i] << " ";
+					cout << endl;
 				}
 			}
 
