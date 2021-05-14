@@ -271,6 +271,8 @@ std::string Ipv4Frame::protocolToString(const unsigned& value)
 		return "IGMP";
 	case IP_PROTOCOL_TCP:
 		return "TCP";
+	case IP_PROTOCOL_UDP:
+		return "UDP";
 	case IP_PROTOCOL_IP_IN_IP:
 		return "IP in IP";
 	case IP_PROTOCOL_ICMPV6:

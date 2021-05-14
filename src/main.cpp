@@ -11,6 +11,7 @@
 #include "../include/Icmpv6Frame.hpp"
 #include "../include/ArpFrame.hpp"
 #include "../include/TcpFrame.hpp"
+#include "../include/UdpFrame.hpp"
 
 using namespace std;
 
@@ -129,7 +130,6 @@ int main()
 						cout << "\tPuntero urgente: " << dec << tcpF.getUrgentPointer() << endl;
 					// mostrar datos
 					cout << "\tContenido: " << endl;
-					cout << "\t\tContenido: " << endl;
 					for (unsigned i(0); i < (ipv4F.getPayloadLength() - tcpF.getHeaderLength() * 4); i++)
 						cout << hex << ((unsigned)tcpF.getPayload()[i] & 0xFF) << " ";
 					cout << endl;
@@ -137,7 +137,33 @@ int main()
 					for (unsigned i(0); i < (ipv4F.getPayloadLength() - tcpF.getHeaderLength() * 4); i++)
 						cout << tcpF.getPayload()[i] << " ";
 					cout << endl;
+					break;
 				}
+				case IP_PROTOCOL_UDP: {
+					UdpFrame udpF;
+					udpF.fromBytes(ipv4F.getPayload());
+
+					std::cout << "UDP" << std::endl;
+					std::cout << "\tPuerto de origen: " << dec << udpF.getSourcePort() << std::endl;
+					std::cout << "\tPuerto de destino: " << dec << udpF.getDestinationPort() << std::endl;
+					std::cout << "\tLongitud: " << dec << udpF.getLength() << " bytes." << std::endl;
+					std::cout << "\tChecksum: 0x" << hex << udpF.getCheckSum() << std::endl;
+					std::cout << "\tContenido: " << std::endl;
+					for (unsigned i(0); i < udpF.getLength() - 8; i++)
+						cout << setw(2) << setfill('0') << hex << ((unsigned)udpF.getPayload()[i] & 0xFF) << " ";
+					cout << endl;
+
+					for (unsigned i(0); i < udpF.getLength() - 8; i++) {
+						if ((udpF.getPayload()[i] >= 'a' && udpF.getPayload()[i] <= 'z') || (udpF.getPayload()[i] >= 'A' && udpF.getPayload()[i] <= 'Z') || udpF.getPayload()[i] == '.')
+							cout << setw(2) << setfill(' ') << udpF.getPayload()[i] << " ";
+						else
+							cout << "  ";
+					}
+					cout << endl;
+					break;
+				}
+				default:
+					break;
 			}
 
 			break;
