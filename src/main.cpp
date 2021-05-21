@@ -12,6 +12,7 @@
 #include "../include/ArpFrame.hpp"
 #include "../include/TcpFrame.hpp"
 #include "../include/UdpFrame.hpp"
+#include "../include/DnsFrame.hpp"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ void showTcpInfo(const char* bytes, unsigned length);
 void showUdpInfo(const char* bytes);
 void showIcmpv4Info(const char* bytes);
 void showIcmpv6Info(const char* bytes);
+void showDnsInfo(const char* bytes);
 
 string knownPortAsString(unsigned port);
 
@@ -220,15 +222,15 @@ void showTcpInfo(const char* bytes, unsigned length)
 	// solo muestra puntero urgente si está la bandera URG
 	if (tcpF.getFlags() & 0b000100000)
 		cout << "\tPuntero urgente: " << dec << tcpF.getUrgentPointer() << endl;
-	// mostrar datos
-	cout << "\tContenido: " << endl;
-	for (unsigned i(0); i < (length - tcpF.getHeaderLength() * 4); i++)
-		cout << hex << ((unsigned)tcpF.getPayload()[i] & 0xFF) << " ";
-	cout << endl;
 
-	for (unsigned i(0); i < (length - tcpF.getHeaderLength() * 4); i++)
-		cout << tcpF.getPayload()[i] << " ";
-	cout << endl;
+	if (tcpF.getDestinationPort() == 53 || tcpF.getSourcePort() == 53) {
+		showDnsInfo(tcpF.getPayload());
+	} else {
+		cout << "\tContenido: " << endl;
+		for (unsigned i(0); i < (length - tcpF.getHeaderLength() * 4); i++)
+			cout << hex << ((unsigned)tcpF.getPayload()[i] & 0xFF) << " ";
+		cout << endl;
+	}
 }
 
 void showUdpInfo(const char* bytes)
@@ -236,25 +238,22 @@ void showUdpInfo(const char* bytes)
 	UdpFrame udpF;
 	udpF.fromBytes(bytes);
 
-	std::cout << "UDP" << std::endl;
-	std::cout << "\tPuerto de origen: " << dec << udpF.getSourcePort()
-		<< " (" << knownPortAsString(udpF.getSourcePort()) << ")" << std::endl;
-	std::cout << "\tPuerto de destino: " << dec << udpF.getDestinationPort()
-		<< " (" << knownPortAsString(udpF.getDestinationPort()) << ")" << std::endl;
-	std::cout << "\tLongitud: " << dec << udpF.getLength() << " bytes." << std::endl;
-	std::cout << "\tChecksum: 0x" << hex << udpF.getCheckSum() << std::endl;
-	std::cout << "\tContenido: " << std::endl;
-	for (unsigned i(0); i < udpF.getLength() - 8; i++)
-		cout << setw(2) << setfill('0') << hex << ((unsigned)udpF.getPayload()[i] & 0xFF) << " ";
-	cout << endl;
+	cout << "UDP" << endl;
+	cout << "\tPuerto de origen: " << dec << udpF.getSourcePort()
+		<< " (" << knownPortAsString(udpF.getSourcePort()) << ")" << endl;
+	cout << "\tPuerto de destino: " << dec << udpF.getDestinationPort()
+		<< " (" << knownPortAsString(udpF.getDestinationPort()) << ")" << endl;
+	cout << "\tLongitud: " << dec << udpF.getLength() << " bytes." << endl;
+	cout << "\tChecksum: 0x" << hex << udpF.getCheckSum() << endl;
 
-	for (unsigned i(0); i < udpF.getLength() - 8; i++) {
-		if ((udpF.getPayload()[i] >= 'a' && udpF.getPayload()[i] <= 'z') || (udpF.getPayload()[i] >= 'A' && udpF.getPayload()[i] <= 'Z') || udpF.getPayload()[i] == '.')
-			cout << setw(2) << setfill(' ') << udpF.getPayload()[i] << " ";
-		else
-			cout << "  ";
+	if (udpF.getDestinationPort() == 53 || udpF.getSourcePort() == 53) {
+		showDnsInfo(udpF.getPayload());
+	} else {
+		cout << "\tContenido: " << endl;
+		for (unsigned i(0); i < udpF.getLength(); i++)
+			cout << hex << ((unsigned)udpF.getPayload()[i] & 0xFF) << " ";
+		cout << endl;
 	}
-	cout << endl;
 }
 
 void showIcmpv4Info(const char* bytes)
@@ -277,23 +276,64 @@ void showIcmpv6Info(const char* bytes)
 	Icmpv6Frame icmpv6F;
 	icmpv6F.fromBytes(bytes);
 
-	std::cout << "ICMPv6" << std::endl;
-	std::cout << "\tTipo: "
+	cout << "ICMPv6" << endl;
+	cout << "\tTipo: "
 		<< Icmpv6Frame::typeToString(icmpv6F.getType())
-		<< " (" << dec <<  icmpv6F.getType() << ")" << std::endl;
-	std::cout << "\tCódigo: "
+		<< " (" << dec <<  icmpv6F.getType() << ")" << endl;
+	cout << "\tCódigo: "
 		<< Icmpv6Frame::codeToString(icmpv6F.getType(), icmpv6F.getCode())
-		<< " (" << dec <<  icmpv6F.getCode() << ")" << std::endl;
-	std::cout << "\tContenido: "
+		<< " (" << dec <<  icmpv6F.getCode() << ")" << endl;
+	cout << "\tContenido: "
 		<< hex
 		<< (unsigned)icmpv6F.getContent()[0]
 		<< " " << (unsigned)icmpv6F.getContent()[1]
 		<< " " << (unsigned)icmpv6F.getContent()[2]
 		<< " " << (unsigned)icmpv6F.getContent()[3]
-		<< std::endl;
+		<< endl;
 }
 
-std::string knownPortAsString(unsigned port)
+void showDnsInfo(const char* bytes)
+{
+	DnsFrame dnsF(bytes);
+	cout << "DNS" << endl;
+	cout << "\tID: " << dnsF.getId() << endl;
+
+	if (dnsF.isResponse()) {
+		cout << "\tEs respuesta (QR: 1)" << endl;
+	} else {
+		cout << "\tEs consulta (QR: 0)" << endl;
+	}
+
+	cout << "\tCódigo de operación: " << dnsF.getOpCode() << " (" << dnsF.opCodeAsString(dnsF.getOpCode()) << ")" << endl;
+	cout << "\tBanderas: " << endl;
+
+	cout << "\t\t";
+
+	if (dnsF.getFlags() & 0b1000) {
+		cout << "AA ";
+	}
+
+	if (dnsF.getFlags() & 0b0100) {
+		cout << "TC ";
+	}
+
+	if (dnsF.getFlags() & 0b0010) {
+		cout << "RD ";
+	}
+
+	if (dnsF.getFlags() & 0b0001) {
+		cout << "RA";
+	}
+	cout << endl;
+
+	cout << "\tRcode: " << dnsF.getRcode() << " (" << dnsF.rCodeAsString(dnsF.getRcode()) << ")" << endl;
+	cout << "\tQD count: " << dnsF.getQdCount() << endl;
+	cout << "\tAN count: " << dnsF.getAnCount() << endl;
+	cout << "\tNS count: " << dnsF.getNsCount() << endl;
+	cout << "\tAR count: " << dnsF.getArCount() << endl;
+}
+
+string knownPortAsString(unsigned port)
 {
 	switch (port) {
 		case 20: case 21:
