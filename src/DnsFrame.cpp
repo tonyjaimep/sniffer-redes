@@ -11,9 +11,26 @@ DnsFrame::DnsFrame(const char* bytes)
 	setAnCount(bytes[6] * 0x100 + bytes[7]);
 	setNsCount(bytes[8] * 0x100 + bytes[9]);
 	setArCount(bytes[10] * 0x100 + bytes[11]);
+
+	unsigned cursor(12);
+
+	DnsQuery** newQueries = (DnsQuery**)malloc(getQdCount() * sizeof(DnsQuery*));
+
+	// read queries
+	for (unsigned i(0); i < getQdCount(); i++) {
+		const char* packetBeginning = bytes + cursor;
+		DnsQuery* newQuery = new DnsQuery(packetBeginning);
+		newQueries[i] = newQuery;
+		cursor += newQuery->getSize();
+	}
+
+	setQueries(newQueries);
 }
 
-DnsFrame::~DnsFrame() {}
+DnsFrame::~DnsFrame()
+{
+	delete queries;
+}
 
 uint16_t DnsFrame::getId() const { return id; }
 void DnsFrame::setId(uint16_t value) { id = value; }
@@ -42,6 +59,9 @@ void DnsFrame::setArCount(uint16_t value) { arCount = value; }
 
 short unsigned DnsFrame::getFlags() const { return flags; }
 void DnsFrame::setFlags(short unsigned value) { flags = value; }
+
+DnsQuery** DnsFrame::getQueries() const { return queries; }
+void DnsFrame::setQueries(DnsQuery** value) { queries = value; }
 
 string DnsFrame::opCodeAsString(short unsigned code)
 {

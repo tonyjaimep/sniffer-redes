@@ -331,6 +331,16 @@ void showDnsInfo(const char* bytes)
 	cout << "\tAN count: " << dnsF.getAnCount() << endl;
 	cout << "\tNS count: " << dnsF.getNsCount() << endl;
 	cout << "\tAR count: " << dnsF.getArCount() << endl;
+
+	if (dnsF.getQdCount() > 0) {
+		cout << "\tConsultas DNS" << endl;
+	}
+
+	for (unsigned i(0); i < dnsF.getQdCount(); i++) {
+		cout << "\t\tDominio: " << dnsF.getQueries()[i]->getDomainName() << endl;
+		cout << "\t\tTipo: " << DnsQuery::typeToString(dnsF.getQueries()[i]->getType()) << endl;
+		cout << "\t\tClase: " << DnsQuery::classToString(dnsF.getQueries()[i]->getClass()) << endl;
+	}
 }
 
 string knownPortAsString(unsigned port)

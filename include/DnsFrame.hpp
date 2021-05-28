@@ -1,5 +1,7 @@
 #pragma once
 
+#include "dns/DnsQuery.hpp"
+
 #include <cinttypes>
 #include <string>
 using std::uint16_t;
@@ -45,6 +47,9 @@ public:
 
 	static string opCodeAsString(short unsigned);
 	static string rCodeAsString(short unsigned);
+
+	void setQueries(DnsQuery**);
+	DnsQuery** getQueries() const;
 private:
 	uint16_t id;
 	bool qr;
@@ -55,4 +60,5 @@ private:
 	uint16_t anCount;
 	uint16_t nsCount;
 	uint16_t arCount;
+	DnsQuery** queries;
 };
