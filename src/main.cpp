@@ -4,6 +4,8 @@
 #include <string>
 #include <exception>
 
+#include <pcap.h>
+
 #include "../include/EthernetFrame.hpp"
 #include "../include/Ipv4Frame.hpp"
 #include "../include/Ipv6Frame.hpp"
@@ -13,6 +15,8 @@
 #include "../include/TcpFrame.hpp"
 #include "../include/UdpFrame.hpp"
 #include "../include/DnsFrame.hpp"
+
+#define ETHERNET_MTU 1514
 
 using namespace std;
 
@@ -31,41 +35,45 @@ string knownPortAsString(unsigned port);
 int main()
 {
 	string filename;
-	ifstream binFile;
-	char* buffer;
+	string continuar;
+	char* errbuf(nullptr);
+	unsigned selectedDeviceIndex;
+	int deviceCount;
+	pcap_if_t* devices;
 
-	cout << "Analizador de Paquetes Ethernet" << endl;
+	cout << "Sniffer en Tiempo Real" << endl;
 	cout << "Equipo 5 de la sección D03" << endl << endl;
 
-	while (!binFile.is_open()) {
-		cout << "Introduzca la localización del paquete (vacío para cancelar): ";
-		cin >> filename;
+	pcap_t* capture = pcap_create(nullptr, errbuf);
 
-		if (filename.size() < 2)
-			return EXIT_SUCCESS;
-
-		binFile.open(filename, ifstream::in | ifstream::binary);
-
-		if (!binFile.is_open())
-			cout << "Error abriendo el archivo." << endl;
+	if (capture == nullptr || errbuf) {
+		cout << "Error creando capturador de paquetes" << endl;
+		cout << errbuf << endl;
+		return EXIT_FAILURE;
 	}
 
-	// va hasta el final
-	binFile.seekg (0, binFile.end);
-	// obtiene la posición del final
-	unsigned length = binFile.tellg();
-	// regresa al inicio
-	binFile.seekg (0, binFile.beg);
+	pcap_activate(capture);
+	pcap_set_snaplen(capture, ETHERNET_MTU);
+	pcap_set_datalink(capture, DLT_EN10MB);
 
-	// buffer contiene todo el contenido del archivo
-	buffer = static_cast<char*>(malloc(length));
+	do {
+		struct pcap_pkthdr header;
+		cout << "Esperando siguiente paquete" << endl;
+		const unsigned char* packet = pcap_next(capture, &header);
 
-	binFile.read(buffer, length);
+		if (packet == nullptr) {
+			cout << "Error abriendo el siguiente paquete" << endl;
+		} else {
+			showEthernetInfo((const char*)packet, ETHERNET_MTU);
+		}
 
-	showEthernetInfo(buffer, length);
+		cout << "¿Leer siguiente paquete? (S/N): " << endl;
 
-	free(buffer);
-	binFile.close();
+		getline(cin, continuar);
+	} while (continuar != "N" && continuar != "n");
+
+	// pcap_freealldevs(devices);
+	pcap_close(capture);
 
 	return EXIT_SUCCESS;
 }

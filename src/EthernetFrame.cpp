@@ -10,40 +10,48 @@ EthernetFrame::~EthernetFrame() {}
 
 void EthernetFrame::fromBytes(const char* bytes, const unsigned long& length)
 {
+	unsigned cursor(0);
 	// cada char es un byte
 	// las direcciones cuentan con 6 bytes
 	//
 	setDestinationAddress(
-		(((unsigned long)bytes[0] & 0xFF)	<< (5 * 8))
-		+ (((unsigned long)bytes[1] & 0xFF)	<< (4 * 8))
-		+ ((bytes[2] & 0xFF)			<< (3 * 8))
-		+ ((bytes[3] & 0xFF)			<< (2 * 8))
-		+ ((bytes[4] & 0xFF)			<< 8)
-		+ ((bytes[5] & 0xFF))
+		(((unsigned long)bytes[cursor] & 0xFF)	<< (5 * 8))
+		+ (((unsigned long)bytes[cursor + 1] & 0xFF)	<< (4 * 8))
+		+ ((bytes[cursor + 2] & 0xFF)			<< (3 * 8))
+		+ ((bytes[cursor + 3] & 0xFF)			<< (2 * 8))
+		+ ((bytes[cursor + 4] & 0xFF)			<< 8)
+		+ ((bytes[cursor + 5] & 0xFF))
 	);
+	cursor += 6;
 
 	setSourceAddress(
-		(((unsigned long)bytes[6] & 0xFF)	<< (5 * 8))
-		+ (((unsigned long)bytes[7] & 0xFF)	<< (4 * 8))
-		+ ((bytes[8] & 0xFF)			<< (3 * 8))
-		+ ((bytes[9] & 0xFF)			<< (2 * 8))
-		+ ((bytes[10] & 0xFF)			<< 8)
-		+ ((bytes[11] & 0xFF))
+		(((unsigned long)bytes[cursor] & 0xFF)	<< (5 * 8))
+		+ (((unsigned long)bytes[cursor + 1] & 0xFF)	<< (4 * 8))
+		+ ((bytes[cursor + 2] & 0xFF)			<< (3 * 8))
+		+ ((bytes[cursor + 3] & 0xFF)			<< (2 * 8))
+		+ ((bytes[cursor + 4] & 0xFF)			<< 8)
+		+ ((bytes[cursor + 5] & 0xFF))
 	);
+	cursor += 6;
+
+	// Ignore 802.1Q Tag
+	if (bytes[cursor] + bytes[cursor + 1] == 0)
+		cursor += 2;
 
 	// son dos bytes
 	setType(
-		(bytes[12] & 0xFF) * 0x100
-		| (bytes[13] & 0xFF)
+		(bytes[cursor] & 0xFF) * 0x100
+		| (bytes[cursor + 1] & 0xFF)
 	);
+	cursor += 2;
 
 	// los primeros 14 bytes no son "data"
-	size_t dataLength = length - 14;
+	size_t dataLength = length - cursor;
 
 	char dataBuffer[dataLength];
 
 	for (unsigned i(0); i < dataLength; i++) {
-		dataBuffer[i] = bytes[i + 14];
+		dataBuffer[i] = bytes[i + cursor];
 	}
 
 	setData(dataBuffer, dataLength);
